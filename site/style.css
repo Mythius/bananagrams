@@ -1,0 +1,15 @@
+body{
+	margin: 0;
+	touch-action: none;
+}
+#game{
+	position: absolute;
+	left: 0;
+	top: 0;
+}
+#tiles{
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	background-color: #ffff88;
+}

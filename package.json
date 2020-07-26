@@ -1,0 +1,29 @@
+{
+  "name": "bananagrams",
+  "version": "1.0.0",
+  "description": "Multiple User Nodejs Server",
+  "main": "index.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-packager ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/mythius/bananagrams.git"
+  },
+  "author": "Matthias Southwick",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mythius/bananagrams/issues"
+  },
+  "homepage": "https://github.com/mythius/bananagrams#readme",
+  "dependencies": {
+    "electron": "^9.1.0",
+    "express": "^4.17.1",
+    "socket.io": "^2.3.0"
+  },
+  "devDependencies": {
+    "electron-packager": "^15.0.0",
+    "electron-winstaller": "^4.0.1"
+  }
+}

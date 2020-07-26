@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Bananagrams Server</title>
+	<link rel="shortcut icon" href="../site/favicon.ico">
+	<style>
+		body{
+			font-family: monospace;
+			background-color: #ffffa0;
+		}
+	</style>
+</head>
+<body>
+	<h1>Bananagrams Server</h1>
+	<button>Begin Game</button>
+	<h3>People</h3>
+	<ul></ul>
+	<h3>Game Info:</h3>
+	<p></p>
+	<script src="main.js"></script>
+	<script src="../site/helpers.js"></script>
+	<script>
+
+		var started = false;
+
+		function update(){
+			setTimeout(update,1000);
+			obj('ul').innerHTML = '';
+			for(let person of client.all){
+				if(person.name != null){
+					obj('ul').appendChild(create('li',person.name));
+				}
+			}
+		}
+		update();
+		obj('button').on('click',e=>{
+			// if(started) return;
+			started = true;
+			beginGame();
+			// log('Game Started');
+		});
+		function log(text){
+			obj('p').innerHTML += text + '<br>';
+		}
+	</script>
+</body>
+</html>
