@@ -4,6 +4,7 @@ var http = require('http').createServer(app);
 var io = require('socket.io')(http);
 var fs = require('fs');
 var system = require('child_process');
+var IP = require('../getip.js').ip;
 
 var file = {
 	save: function(name,text){

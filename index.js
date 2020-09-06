@@ -6,7 +6,8 @@ function createWindow () {
     height: 400,
     webPreferences: {
       nodeIntegration: true
-    }
+    },
+    icon: __dirname + '/site/favicon.ico'
   })
 
   win.loadFile('backend/index.html')

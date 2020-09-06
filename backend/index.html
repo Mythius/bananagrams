@@ -12,6 +12,7 @@
 </head>
 <body>
 	<h1>Bananagrams Server</h1>
+	<h2>Ip Address: <ip></ip></h2>
 	<button>Begin Game</button>
 	<h3>People</h3>
 	<ul></ul>
@@ -22,7 +23,7 @@
 	<script>
 
 		var started = false;
-
+		obj('ip').innerHTML = require('../getip.js').ip;
 		function update(){
 			setTimeout(update,1000);
 			obj('ul').innerHTML = '';
