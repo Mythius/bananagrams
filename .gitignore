@@ -1,0 +1,4 @@
+node_modules/*
+bananagrams-win32-x64/*
+package-lock.json
+bananagrams-installer/*
