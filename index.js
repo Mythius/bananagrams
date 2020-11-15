@@ -119,7 +119,7 @@ function countTiles(user) {
 }
 
 class client {
-    static all = [];
+    // static all = [];
     constructor(socket) {
         this.socket = socket;
         this.name = null;
@@ -136,8 +136,9 @@ class client {
         this.socket.emit(name, dat);
     }
 }
+client.all = [];
 
-const port = 80;
+const port = 8080;
 const path = __dirname + '/';
 
 app.use(express.static(path + 'site/'));
