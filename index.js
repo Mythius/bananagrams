@@ -18,7 +18,7 @@ function update() {
         setTimeout(update,5*1000);
     } else return;
     console.clear();
-    console.log('IP: '+ip);
+    console.log(`IP: ${ip}:${port==80?'':port}`);
     for(let user of client.all){
         console.log(user.name);
     }
