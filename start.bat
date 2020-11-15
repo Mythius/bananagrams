@@ -1,4 +1,4 @@
 @echo off
 start http://localhost
-npm run start
+node index.js
 pause

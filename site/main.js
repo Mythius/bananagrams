@@ -252,7 +252,7 @@ setup();
 var words;
 
 xml('words.txt',w=>{
-	words = w.split('\n');
+	words = w.split('\n').map(e=>e.trim());
 });
 
 function reverseColor(x,y,dx,dy,v){
