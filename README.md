@@ -2,7 +2,7 @@
 
 Multiplayer Game
 Electron Application for Backend
-Can be downloaded from http://matthiassouthwick.x10host.com/banagrams.exe
+Can be downloaded from http://southwick.ddns.net/bananagrams
 
 To run as developer
 
@@ -12,4 +12,4 @@ To run as developer
 <br>
 `npm i`
 <br>
-`npm start`
+`node main.js`
