@@ -14,5 +14,29 @@
 	<canvas id="game"></canvas>
 	<canvas id="tiles"></canvas>
 	<script src="main.js"></script>
+	<div id=menu>
+		Welcome to Banagrams
+		<div id=opts>
+			<br><button style='display:none'>Start Game</button>
+			<!-- <br><button>Join a Game</button> -->
+		</div>
+		<p id=players>Players:<br></p>
+	</div>
+	<p id=message>Message Board</p>
+	<script>
+		socket.on('host',e=>{
+			console.log('You are host');
+			obj('button').style.display='inherit';
+		});
+		socket.on('joined',names=>{
+			obj('p').innerHTML = 'Players:<br>' + names.join('<br>');
+		});
+		obj('button').on('click',e=>{
+			socket.emit('start');
+		});
+		socket.on('message',m=>{
+			obj('#message').innerHTML = m;
+		});
+	</script>
 </body>
 </html>

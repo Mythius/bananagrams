@@ -25,6 +25,7 @@ class Button{
 		this.height = font_size + 10;
 		ctx.fillStyle = '#222';
 		ctx.strokeStyle = 'white';
+		ctx.beginPath();
 		ctx.rect(this.x,this.y,this.width,this.height);
 		ctx.fill();
 		ctx.stroke();
@@ -44,6 +45,7 @@ var trade;
 var playing = false;
 
 function setup(){
+	socket.emit('bananagrams-connect');
 	socket.emit('name',prompt("Enter your name"));
 	grid = new Grid(25,25,25);
 	tiles = new Grid(9,3,30);
@@ -131,6 +133,7 @@ socket.on('winner',name=>{
 });
 
 socket.on('tiles',ts=>{
+	obj('#menu').remove();
 	playing = true;
 	letters = ts;
 	let counter = 0;
@@ -185,37 +188,35 @@ function swapFocus(tile){
 }
 
 Touch.init(dat=>{
-	if(!playing) return;
-	if(dat.type == 'single'){
-		if(Math.abs(dat.dx) < 10 && Math.abs(dat.dy) < 10){
-			// Clicked
-			if(dat.target == canvas){
-				let t = grid.getTile(dat.x,dat.y);
-				if(t) swapFocus(t);
-			} else if(dat.target == tcanvas){
-				let t = tiles.getTile(dat.x,dat.y);
-				if(t) swapFocus(t);
-				else {
-					trade.click(dat.x,dat.y);
-				}
+	// if(!playing) return;
+	if(dat.type == 'click'){
+		if(dat.target == canvas){
+			let t = grid.getTile(dat.x,dat.y);
+			if(t) swapFocus(t);
+		} else if(dat.target == tcanvas){
+			let t = tiles.getTile(dat.x,dat.y);
+			if(t){
+				swapFocus(t);
+			} else {
+				trade.click(dat.x,dat.y);
 			}
-		} else {
+		}
+	} else if(dat.type == 'scroll') {
 			// Scroll
-			if(dat.target == canvas){
-				grid.offsetX += dat.dx;
-				grid.offsetY += dat.dy;
-			} else if(dat.target == tcanvas){
-				tiles.offsetX += dat.dx;
-				trade.x += dat.dx;
-			}
+		if(dat.target == canvas){
+			grid.offsetX += dat.dx;
+			grid.offsetY += dat.dy;
+		} else if(dat.target == tcanvas){
+			tiles.offsetX += dat.dx;
+			trade.x += dat.dx;
 		}
-	} else if (dat.type == 'double'){
-		// Zoom
-		if(Math.abs(dat.touch1.y) < Math.abs(dat.touch2.y)){
-			grid.scale = grid.scale - dat.touch1.dy / grid.scale * 3;
-		} else {
-			grid.scale = grid.scale - dat.touch2.dy / grid.scale * 3;
-		}
+	} else if (dat.type == 'zoom'){
+		let dt = {x:dat.ct.x-grid.offsetX,y:dat.ct.y-grid.offsetY};
+		dt.x *= dat.scale;
+		dt.y *= dat.scale;
+		grid.offsetX = dat.ct.x - dt.x;
+		grid.offsetY = dat.ct.y - dt.y;
+		grid.scale *= dat.scale;
 	}
 });
 
@@ -252,7 +253,7 @@ setup();
 var words;
 
 xml('words.txt',w=>{
-	words = w.split('\n');
+	words = w.split('\n').map(e=>e.trim());
 });
 
 function reverseColor(x,y,dx,dy,v){
@@ -324,7 +325,7 @@ function checkWord(word){
 	return false;
 }
 
-document.on('dblclick',e=>{
-	grid.scale = 25;
-	resize();
-});
+// document.on('dblclick',e=>{
+// 	grid.scale = 25;
+// 	resize();
+// });

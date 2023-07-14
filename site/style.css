@@ -13,3 +13,36 @@ body{
 	left: 0;
 	background-color: #ffff88;
 }
+#menu{
+	position: fixed;
+	background-color: #ffff88;
+	display: block;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%,-50%);
+	padding: 20px;
+	text-align: center;
+	font-size: 40px;
+	border: 2px solid white;
+	border-radius: 20px;
+}
+#opts{
+	display: inline;
+}
+#menu button{
+	width: 80%;
+	padding: 5px;
+}
+#menu p{
+	font-size: 15px;
+}
+#message{
+	background-color: white;
+	padding: 0 0 0 3px;
+	display: block;
+	position: fixed;
+	left: 0;
+	bottom: 100px;
+	color: black;
+	margin: 0;
+}

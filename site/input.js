@@ -56,51 +56,78 @@ class Touch{
     static init(callback){
         document.on('touchstart',e=>{
             for(let touch of e.changedTouches){
-                Touch.touches.push([touch]);
+                Touch.touches[touch.identifier] = touch;
                 e.preventDefault();
             }
         });
-        document.on('touchend',e=>{
-            let et = e.changedTouches[0];
-            let oe = Touch.touches.filter(ev=>ev[0].identifier==et.identifier)[0];
-            if(Touch.resolved.length == 0 && Touch.touches.length == 1){
-                let target = oe[0].target;
-                let br = target.getBoundingClientRect();
-                callback({
-                    type: 'single',
-                    dx: et.clientX - oe[0].clientX,
-                    dy: et.clientY - oe[0].clientY,
-                    x: et.clientX - br.left,
-                    y: et.clientY - br.top,
-                    target: oe[0].target
-                });
-                Touch.touches = [];
-                Touch.resolved = [];
-            } else {
-                if(oe === undefined) return;
-                oe.push(et);
-                if(Touch.resolved.length > 0){
-                    let ot = Touch.resolved[0][0];
+
+        document.on('touchmove',e=>{
+            if(Touch.touches.filter(e=>e).length == 1){
+                for(let touch of e.changedTouches){
+                    let last_pos = Touch.touches[touch.identifier];
                     callback({
-                        type: 'double',
-                        touch1: {
-                            dx: oe[1].clientX - oe[0].clientX,
-                            dy: oe[1].clientY - oe[0].clientY,
-                            x: oe[1].clientX,
-                            y: oe[1].clientY
-                        },
-                        touch2: {
-                            dx: ot[1].clientX - ot[0].clientX,
-                            dy: ot[1].clientY - ot[0].clientY,
-                            x: ot[1].clientX,
-                            y: ot[1].clientY
-                        }
+                        type: 'scroll',
+                        x: touch.clientX,
+                        y: touch.clientY,
+                        dx: touch.clientX - last_pos.clientX,
+                        dy: touch.clientY - last_pos.clientY,
+                        target: last_pos.target
                     });
-                    Touch.touches = [];
-                    Touch.resolved = [];
-                } else {
-                    Touch.resolved.push(Touch.touches.splice(Touch.touches.indexOf(oe),1));
+                    touch.action='scroll';
+                    Touch.touches[touch.identifier] = touch;
+                } 
+            } else {
+                let counter = 0;
+                let tmps = [];
+                for(let last_pos of Touch.touches.filter(e=>e)){
+                    let touch = [...e.changedTouches].filter(e=>last_pos.identifier==e.identifier)[0];
+                    if(touch){
+                        tmps.push({
+                            x: touch.clientX,
+                            y: touch.clientY,
+                            dx: touch.clientX - last_pos.clientX,
+                            dy: touch.clientY - last_pos.clientY
+                        });
+                        touch.action='zoom';
+                        Touch.touches[touch.identifier] = touch;
+                    } else {
+                        tmps.push({
+                            x: last_pos.clientX,
+                            y: last_pos.clientY,
+                            dx: 0,
+                            dy: 0
+                        });
+                    }
+                    if(++counter == 2) break;
                 }
+                let scale = (tmps[0].y+tmps[0].dy-tmps[1].y-tmps[1].dy)/(tmps[0].y-tmps[1].y);
+                let ct = {x:(tmps[0].x+tmps[1].x)/2,y:(tmps[0].y+tmps[1].y)/2};
+                callback({
+                    type: 'zoom',
+                    touch1: tmps[0],
+                    touch2: tmps[1],
+                    scale,
+                    ct
+                });
+            }
+        })
+
+        document.on('touchend',e=>{
+            for(let touch of e.changedTouches){
+                let ot = Touch.touches[touch.identifier];
+                if(!ot.action){
+                    let dx=ot.clientX-touch.clientX,dy=ot.clientY-touch.clientY;
+                    if(Math.sqrt(dx**2+dy**2) < 5){
+                        let br = ot.target.getBoundingClientRect();
+                        callback({
+                            type:'click',
+                            x:ot.clientX - br.x,
+                            y:ot.clientY - br.y,
+                            target:ot.target
+                        });
+                    }
+                }
+                Touch.touches[touch.identifier] = null;
             }
         });
     }
