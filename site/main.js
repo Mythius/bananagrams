@@ -47,7 +47,7 @@ var playing = false;
 function setup(){
 	socket.emit('bananagrams-connect');
 	socket.emit('name',prompt("Enter your name"));
-	grid = new Grid(25,25,25);
+	grid = new Grid(50,50,25);
 	tiles = new Grid(9,3,30);
 	resize();
 	// mouse.start(canvas);
@@ -187,37 +187,96 @@ function swapFocus(tile){
 	}
 }
 
+function click(dat){ // x,y,target
+	if(dat.target == canvas){
+		let t = grid.getTile(dat.x,dat.y);
+		if(t) swapFocus(t);
+	} else if(dat.target == tcanvas){
+		let t = tiles.getTile(dat.x,dat.y);
+		if(t){
+			swapFocus(t);
+		} else {
+			trade.click(dat.x,dat.y);
+		}
+	}
+}
+
+function scroll(dat){ // dx,dy,target
+	if(dat.target == canvas){
+		grid.offsetX += dat.dx;
+		grid.offsetY += dat.dy;
+	} else if(dat.target == tcanvas){
+		tiles.offsetX += dat.dx;
+		trade.x += dat.dx;
+	}
+}
+
+function zoom(dat){ // ct.x,ct.y,scale
+	let dt = {x:dat.ct.x-grid.offsetX,y:dat.ct.y-grid.offsetY};
+	dat.scale = Math.min(Math.max(10, grid.scale*dat.scale), 150)/grid.scale;
+	dt.x *= dat.scale;
+	dt.y *= dat.scale;
+	grid.offsetX = dat.ct.x - dt.x;
+	grid.offsetY = dat.ct.y - dt.y;
+	grid.scale *= dat.scale;
+}
+
 Touch.init(dat=>{
+	touchscreen = true;
 	// if(!playing) return;
 	if(dat.type == 'click'){
-		if(dat.target == canvas){
-			let t = grid.getTile(dat.x,dat.y);
-			if(t) swapFocus(t);
-		} else if(dat.target == tcanvas){
-			let t = tiles.getTile(dat.x,dat.y);
-			if(t){
-				swapFocus(t);
-			} else {
-				trade.click(dat.x,dat.y);
-			}
-		}
+		click(dat);
 	} else if(dat.type == 'scroll') {
-			// Scroll
-		if(dat.target == canvas){
-			grid.offsetX += dat.dx;
-			grid.offsetY += dat.dy;
-		} else if(dat.target == tcanvas){
-			tiles.offsetX += dat.dx;
-			trade.x += dat.dx;
-		}
+		scroll(dat);
 	} else if (dat.type == 'zoom'){
-		let dt = {x:dat.ct.x-grid.offsetX,y:dat.ct.y-grid.offsetY};
-		dt.x *= dat.scale;
-		dt.y *= dat.scale;
-		grid.offsetX = dat.ct.x - dt.x;
-		grid.offsetY = dat.ct.y - dt.y;
-		grid.scale *= dat.scale;
+		zoom(dat);
 	}
+});
+
+
+var mouse = {ox:-1,oy:-1,down:false,action:null,target:null}
+document.on('mousedown',e=>{
+	if(touchscreen) return;
+	mouse.down = true;
+	mouse.target = e.target;
+	mouse.ox=e.clientX;
+	mouse.oy=e.clientY;
+});
+
+document.on('mousemove',e=>{
+	if(touchscreen) return;
+	if(mouse.down){
+		scroll({
+			dx:e.movementX,
+			dy:e.movementY,
+			target:mouse.target
+		});
+		mouse.action='scroll';
+	}
+});
+
+document.on('mouseup',e=>{
+	if(touchscreen) return;
+	mouse.down = false;
+	let dx=e.clientX-mouse.ox,dy=e.clientY-mouse.oy;
+	if(Math.sqrt(dx**2+dy**2)<10){
+		let br = mouse.target.getBoundingClientRect();
+		let dat = {
+			x:e.clientX - br.x,
+			y:e.clientY - br.y,
+			target:mouse.target
+		};
+		click(dat);
+	}
+	mouse.action=null;
+	mouse.target=null;
+});
+
+document.on('wheel',e=>{
+	zoom({
+		ct:{x:e.x,y:e.y},
+		scale:1+(e.deltaY/-600)
+	});
 });
 
 Grid.prototype.getTile = function(x,y){
@@ -255,6 +314,8 @@ var words;
 xml('words.txt',w=>{
 	words = w.split('\n').map(e=>e.trim());
 });
+
+var touchscreen = false;
 
 function reverseColor(x,y,dx,dy,v){
 	let curtile = grid.getTileAt(x,y);

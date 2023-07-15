@@ -1,36 +1,36 @@
-class mouse{
-    static pos = { x: 0, y: 0 };
-    static down = false;
-    static right = false;
-    static start(element=document.documentElement) {
-        function mousemove(e) {
-            let br = element.getBoundingClientRect();
-            mouse.pos.x = e.clientX - br.left;
-            mouse.pos.y = e.clientY - br.top;
-        }
+// class mouse{
+//     static pos = { x: 0, y: 0 };
+//     static down = false;
+//     static right = false;
+//     static start(element=document.documentElement) {
+//         function mousemove(e) {
+//             let br = element.getBoundingClientRect();
+//             mouse.pos.x = e.clientX - br.left;
+//             mouse.pos.y = e.clientY - br.top;
+//         }
 
-        function mouseup(e) {
-            if(e.which == 1){
-                mouse.down = false;
-            } else if(e.which == 3){
-                mouse.right = false;
-            }
-        }
+//         function mouseup(e) {
+//             if(e.which == 1){
+//                 mouse.down = false;
+//             } else if(e.which == 3){
+//                 mouse.right = false;
+//             }
+//         }
 
-        function mousedown(e) {
-            mousemove(e);
-            if(e.which == 1){
-                mouse.down = true;
-            } else if(e.which == 3){
-                mouse.right = true;
-            }
-        }
-        document.addEventListener('mousemove', mousemove);
-        document.addEventListener('mouseup', mouseup);
-        document.addEventListener('mousedown', mousedown);
-        document.addEventListener('contextmenu',e=>{e.preventDefault()});
-    }
-}
+//         function mousedown(e) {
+//             mousemove(e);
+//             if(e.which == 1){
+//                 mouse.down = true;
+//             } else if(e.which == 3){
+//                 mouse.right = true;
+//             }
+//         }
+//         document.addEventListener('mousemove', mousemove);
+//         document.addEventListener('mouseup', mouseup);
+//         document.addEventListener('mousedown', mousedown);
+//         document.addEventListener('contextmenu',e=>{e.preventDefault()});
+//     }
+// }
 class keys{
     static keys = [];
     static start(){
@@ -100,8 +100,16 @@ class Touch{
                     }
                     if(++counter == 2) break;
                 }
-                let scale = (tmps[0].y+tmps[0].dy-tmps[1].y-tmps[1].dy)/(tmps[0].y-tmps[1].y);
+                let scaley = (tmps[0].y+tmps[0].dy-tmps[1].y-tmps[1].dy)/(tmps[0].y-tmps[1].y);
+                let scalex = (tmps[0].x+tmps[0].dx-tmps[1].x-tmps[1].dx)/(tmps[0].x-tmps[1].x);
                 let ct = {x:(tmps[0].x+tmps[1].x)/2,y:(tmps[0].y+tmps[1].y)/2};
+                // let scale = Math.abs(1-scalex)>Math.abs(1-scaley)?scalex:scaley;
+                scalex = Math.max(Math.min(scalex,2),.5);
+                scaley = Math.max(Math.min(scaley,2),.5);
+                let scale = scaley;
+                if(Math.abs(scale)>2) return;
+                if(isNaN(scale)) return;
+                if(scale == 0) return;
                 callback({
                     type: 'zoom',
                     touch1: tmps[0],
