@@ -1,15 +1,8 @@
 #Bananagrams
 
-Multiplayer Game
-Electron Application for Backend
-Can be downloaded from http://southwick.ddns.net/bananagrams
+Remake of the Popular Word game banagrams
+play with your friends at
 
-To run as developer
+http://southwick.ddns.net/bananagrams
 
-`git clone http://github.com/mythius/bananagrams`
-<br>
-`cd bananagrams`
-<br>
-`npm i`
-<br>
-`node main.js`
+I made this with node.js, socket.io and express
