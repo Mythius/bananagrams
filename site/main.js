@@ -160,7 +160,19 @@ socket.on('addtiles',ts=>{
 	});
 });
 
+
+socket.on('setup',clearAll);
+
 var fc;
+
+function clearAll(){
+	grid.forEach(tile=>{
+		tile.letter='';
+	});
+	tiles.forEach(tile=>{
+		tile.letter='';
+	})
+}
 
 function swapFocus(tile){
 	var bgc = tile.grid == tiles ? '#222' : '#222';

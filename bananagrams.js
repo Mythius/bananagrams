@@ -62,6 +62,7 @@ function beginGame(){
 		p.tiles = tiles.splice(-15);
 	}
 	for(let p of peopleInGame){
+		p.emit('setup');
 		p.emit('tiles',p.tiles);
 	}
 	for(let p of peopleInGame){
@@ -124,6 +125,8 @@ function countTiles(user){
 			person.emit('message',user+' won! Good Game. Reload Page to play again')
 			person.emit('winner',user);
 		}
+		lobby = [...peopleInGame];
+		host = null;
 		peopleInGame = [];
 		playing = false;
 		return true;
@@ -132,17 +135,24 @@ function countTiles(user){
 
 function disconnect(client){
 	if(host==client) host=null;
-	let ix = peopleInGame.indexOf(client);
-	if(ix!=-1){
-		peopleInGame.splice(ix,1);
-	}
-	if(peopleInGame.length==0){
-		playing=false;
-		lobby = [];
-		console.log('Nobody Connected, Resetting Game');
+	if(playing){
+		let ix = peopleInGame.indexOf(client);
+		if(ix!=-1){
+			peopleInGame.splice(ix,1);
+		}
+		if(peopleInGame.length==0){
+			playing=false;
+			lobby = [];
+			console.log('Nobody Connected, Resetting Game');
+		} else {
+			for(let p of peopleInGame){
+				p.emit('message',client.name+' disconnected');
+			}
+		}
 	} else {
-		for(let p of peopleInGame){
-			p.emit('message',client.name+' disconnected');
+		let lx = lobby.indexOf(client);
+		if(lx!=-1){
+			lobby.splice(lx,1);
 		}
 	}
 }
